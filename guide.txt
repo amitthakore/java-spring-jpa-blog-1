@@ -10,3 +10,133 @@ Module 2:
 Module 3: Create the Category Entity and Repository
 7 tasks | 10m
 In this module, we'll create the Category Entity and corresponding JpaRepository.
+Add the Category Entity
+
+
+We can also represent the Category model class with a database table by turning it into a JPA entity. To do this, add the @Entity notation before the class declaration. The @Entity notation alone will throw errors without a defined @Id, so also add the @Id notation before the id field. Also add the @GeneratedValue(strategy = GenerationType.IDENTITY) notation after @Id and before the id property.
+
+2
+
+Add to the Post class a ManyToOne Category
+
+
+Add a private Category property called category to the Post Entity class and use the @ManyToOne annotation. We also need to do a few additional things in the Post class for the Category relationship: Add a getter, public Category getCategory(), that returns category. Add a setter, public void setCategory(Category category), that sets category to the passed in parameter.
+
+3
+
+Add a List of Posts to the Category Class
+
+
+Add the corresponding property to the Category Entity class, which will be a List<Post> called posts with the @OneToMany annotation.
+
+We also need to do a few additional things in the Category class for the Post relationship:
+
+To the default constructor, after  super();, initialize posts to a new empty ArrayList.
+Also edit the getter, public List<Post> getPosts(), to return posts instead of null.
+And in lieu of a setter, edit  public void addPost(Post post) to add the passed-in post parameter to the posts list instead of the return; statement.
+4
+
+Turn CategoryRepository into a JpaRepository
+
+
+In CategoryRepository.java, delete everything except for the package. Replace the CategoryRepository class declaration with: public interface CategoryRepository extends JpaRepository<Category, Long> {}
+
+Make sure to also import:
+
+import com.pluralsight.blog.model.Category;
+import org.springframework.data.repository.JpaRepository;
+5
+
+Add findByCategory() to PostRepository
+
+
+We also want to add the ability to find Posts by their Category. To do this we can leverage the magic of Spring’s JpaRepository interface and simply declare the following method inside of the PostRepository interface: List<Post> findByCategory(Category category);
+
+6
+
+Load Post and Category data from a file
+
+
+Copy all of the contents of the data-categories.sql file and replace what is in the src/main/resources/data.sql file.
+
+7
+
+Display the category on the post detail page
+
+
+In src/main/resources/templates/post-details.html, find the <h3> tag that has the text Category placeholder. Remove that text and instead add a th:text attribute that displays the result of calling post.getCategory().getName().
+
+To see this working, run your app and click on a Post displayed at localhost:8080. Then see the category displayed at the top of the post’s detail page
+
+
+Module 4: Display all categories and individual categories
+7 tasks | 10m
+1
+Add CategoryRepository property to BlogController
+
+
+In BlogController.java, add a private CategoryRepository property named categoryRepository. Also add a CategoryRepository parameter to the constructor and initialize categoryRepository to the passed in value.
+
+2
+Pass the Category List to the home template
+
+
+In the listPosts() method, before the return statement, create a List<Category> variable and set it equal to the result of calling categoryRepository.findAll() method. Then make sure to pass the List to the template by calling put() on the ModelMap with the key "categories" and the Category List you just created.
+
+3
+Iterate over the categories in header.html
+
+
+In header.html, inside the <li> tag, remove the "Categories Placeholder" text. Then to loop over the categories, add a foreach loop attribute to the <li> tag: th:each="category : ${categories}".
+
+4
+Display each Category's name
+
+
+Add a <span> tag inside the <li> tag with the following attribute: th:text="${#strings.toUpperCase(category.getName())}".
+
+5
+Add a link to the Category
+
+
+Add an <a> tag around the <span> tag with the following attribute: th:href="@{'/category/' + ${category.getId()}}".
+
+6
+Add a route to handle the Category request
+
+
+Now we need to add a route in the BlogController class to handle the /category/{id} url. In BlogController.java, add the method: public String categoryList(@PathVariable Long id, ModelMap modelMap) that returns “category-list”.
+
+7
+Capture the id parameter with @RequestMapping
+
+
+We also need a @RequestMapping annotation before the method declaration to capture the passed-in id: @RequestMapping("/category/{id}").
+
+8
+Find the Category by its id
+
+
+On the first line of categoryList(), we want to find the Category that corresponds to the passed in id value. We can do that by calling: categoryRepository.findById(id).orElse(null); and setting the result equal to a Category variable. Then make sure to pass the category to the template by calling put() on the ModelMap with the key "category" and the Category variable you just created.
+
+9
+Find Posts by Category
+
+
+Next, find the Posts that belong to that Category. Call postRepository.findByCategory() and pass in the Category variable. Set the result equal to a List<Post> variable. Then pass this List to the template with modelMap.put() and the key "posts".
+
+10
+Find all Categories
+
+
+The template will also need all of the categories to display in the header, so find all of the categories by calling: categoryRepository.findAll(). Save the result to a  List<Category> variable, then pass this List to the template with modelMap.put("categories", categories);
+
+(Note: Or you can just copy those lines of the listPosts() method.)
+
+11
+Display the Category in the category-list template
+
+
+The template category-list.html is almost exactly the same as home.html, but we also want to display the name of the Category we’re displaying posts from. Below the <main role="main" class="py-5 flex-fill"> and <div class="container"> tags, create an <h2> tag with a th:text attribute that calls category.getName().
+
+Congratulations, your app is complete! Try it out by running it and going to the home page - if you click on each of the Categories in the Navbar on the Home page, you will see the Posts listed that belong to that Category.

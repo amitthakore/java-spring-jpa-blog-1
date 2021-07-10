@@ -16,6 +16,7 @@ import java.util.Optional;
 public class BlogController {
 
     private PostRepository postRepository;
+    private CategoryRepository categoryRepository;
 
     public BlogController(PostRepository postRepository) {
         this.postRepository = postRepository;
@@ -25,6 +26,8 @@ public class BlogController {
     public String listPosts(ModelMap modelMap) {
         List<Post> posts = postRepository.findAll();
         modelMap.put("posts", posts);
+        List<Category> category = categoryRepository.findAll();
+        modelMap.put("categories", category);
         return "home";
     }
 
