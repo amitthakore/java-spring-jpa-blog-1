@@ -1,0 +1,12 @@
+Module 1:
+7 tasks | 10m
+
+
+Module 2:
+7 tasks | 10m
+
+
+
+Module 3: Create the Category Entity and Repository
+7 tasks | 10m
+In this module, we'll create the Category Entity and corresponding JpaRepository.
