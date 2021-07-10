@@ -2,9 +2,50 @@ Module 1:
 7 tasks | 10m
 
 
-Module 2:
+Module 2: Create the Post Entity and Repository
 7 tasks | 10m
+1
 
+Create the Post Entity
+
+
+In Post.java, we want to convert the static Post model class to represent a database table by turning it into a JPA entity. To do this, add the @Entity notation before the class declaration. The @Entity notation alone will throw errors without a defined @Id, so also add the @Id notation before the id field. Also add the @GeneratedValue(strategy = GenerationType.IDENTITY) notation after @Id and before the id property.
+
+2
+
+Update the length of the body property
+
+
+Since the body of the blog post will be long, we want to add the following annotations: @Column(length=1000000) and @Lob to store the data as binary data.
+
+3
+
+Specify the date property's precision
+
+
+Add @Temporal(TemporalType.DATE) to the date property, which will tell the database that this property represents time and the precision is date.
+
+4
+
+Turn PostRepository into a JpaRepository
+
+
+In PostRepository.java, delete everything except for the package. Instead of generating static data in there, we want to extend the Spring Framework’s JpaRepository so that we can expose basic CRUD operations for our Post Model for free. Replace the PostRepository class declaration with: public interface PostRepository extends JpaRepository<Post, Long> {} .
+
+Make sure to also import:
+
+import com.pluralsight.blog.model.Post;
+import org.springframework.data.repository.JpaRepository;
+(Note: The method calls in the BlogController class, postRepository.findAll() and postRepository.findById(id), do not have to be changed since the methods have the same name as those provided by JpaRepository.)
+
+5
+
+Load data from a file
+
+
+Move the data.sql file from the base directory of the project to the src/main/resources/ directory. This will allow Spring to load Post data from that file into our database whenever the app launches.
+
+Congratulations! Now the Post data is being loaded from a database, and if you run the app you can see the posts displayed at localhost:8080.
 
 
 Module 3: Create the Category Entity and Repository
